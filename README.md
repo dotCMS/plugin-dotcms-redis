@@ -1,4 +1,4 @@
-# Dotcms & Redis
+# dotCMS & Redis
 
 This plugin will override the internal dotcms caching infrastructure (Guava) and replace it with redis, an external caching mechanism.  This plugin is provided "as is" and any implementation of it should go through extensive testing before using it in a production environment.
 
