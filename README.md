@@ -1,6 +1,6 @@
 # Dotcms & Redis
 
-This plugin will override the internal dotcms caching infrastructure (Guava) and replace it with redis, an external caching mechanism.  
+This plugin will override the internal dotcms caching infrastructure (Guava) and replace it with redis, an external caching mechanism.  This plugin is provided "as is" and any implementation of it should go through extensive testing before using it in a production environment.
 
 ## Benefits
 
@@ -15,12 +15,15 @@ The benefits of redis are multiple:
 ## About Redis
 Redis needs to be configured externally to dotcms and there is a lot to learn in running a Redis server.  For more information, see: http://Redis.io
 
-
-
 ## Configuring
 You point to a redis server/port by using the [dotmarketing-config.properties](https://github.com/dotCMS/plugin-dotcms-redis/blob/master/conf/dotmarketing-config-ext.properties) 
 
 Hopefully, the [config](https://github.com/dotCMS/plugin-dotcms-redis/blob/master/conf/dotmarketing-config-ext.properties) is self documenting.
+
+## Master / Slave support
+
+
+
 
 
 ## Testing
