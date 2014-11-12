@@ -47,6 +47,29 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 
 	private Map<String, Object> cacheStatus;
 
+	@Override
+	public Object getMemory(String key, String group) throws DotCacheException {
+
+		return super.getMemory(key, group);
+	}
+
+	@Override
+	public Object getDisk(String key, String group) throws DotCacheException {
+		return super.getDisk(key, group);
+	}
+
+	@Override
+	public List<Map<String, Object>> getCacheStatsList() {
+
+		return super.getCacheStatsList();
+	}
+
+	@Override
+	public String getCacheStats() {
+
+		return super.getCacheStats();
+	}
+
 	public RedisCacheAdministratorImpl() {
 		// super();
 		String writeHost = Config.getStringProperty("redis.server.write.address",
@@ -87,7 +110,7 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 
 		}
 
-		cacheStatus = new LRUMap(100);
+
 	}
 
 	/*
@@ -177,9 +200,8 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 		if (key == null || group == null) {
 			return null;
 		}
-		if(group.equals("VelocityCache") && key.endsWith(".vm")){
-			return null;
-		}
+		
+
 		StringWriter k = new StringWriter();
 		k.append(key.toLowerCase());
 		k.append(delimit);
@@ -259,6 +281,11 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 	 */
 	public void put(String key, final Object content, String group) {
 		if (key == null || group == null) {
+			return;
+		}
+		
+		// velocity macros cannot be cached
+		if(group.equals("VelocityCache") && key.endsWith(".vm")){
 			return;
 		}
 		StringWriter k = new StringWriter();
