@@ -1,6 +1,6 @@
 # dotCMS & Redis
 
-This plugin will override the internal dotcms caching infrastructure (Guava) and replace it with redis, an external caching mechanism.  This plugin is provided "as is" and any implementation of it should go through extensive testing before using it in a production environment.
+This static (not osgi) plugin will override the internal dotcms caching infrastructure (Guava) and replace it with redis, an external caching mechanism.  This plugin is provided "as is" and any implementation of it should go through extensive testing before using it in a production environment.
 
 ## Benefits
 
@@ -21,9 +21,7 @@ You point to a redis server/port by using the [dotmarketing-config.properties](h
 Hopefully, the [config](https://github.com/dotCMS/plugin-dotcms-redis/blob/master/conf/dotmarketing-config-ext.properties) is self documenting.
 
 ## Master / Slave support
-
-
-
+You can specify different servers to read from and to write to. This allows you to set up Redis in a master / slave configuration and write to the master and read from a slave.
 
 
 ## Testing
@@ -32,26 +30,11 @@ To test, fire up a redis server locally, on port 6379 (should be the default):
 redis-server
 ```
 
-Then deploy this plugin, start dotcms and volia, keys starting to fill your
-redis server.  
-```
-memcached -d
-```
+
 
 
 ## Library
 
-The library used in this implementation is called XMemcached.  You can read more about it
-here:
-
-https://code.google.com/p/xmemcached/
+The library used in this implementation is called Jedis.  Jedis uses a configurable pool of connections to access the Redis server.
 
 
-## Adding and removing servers from the memcached cluster
-The code for adding or removing servers from the memcached cluster looks like this:
-
-```
-MemcachedCacheAdministratorImpl mem = (MemcachedCacheAdministratorImpl) CacheLocator.getCacheAdministrator().getImplementationObject();
-mem.addServer("127.0.0.1:11212", 5);
-mem.removeServer("127.0.0.1:11212");
-```
