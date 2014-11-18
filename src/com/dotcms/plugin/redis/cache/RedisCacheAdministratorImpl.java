@@ -169,25 +169,29 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 		try {
 			jed = writePool.getResource();
 			boolean go = it.hasNext();
+			List<String> del = new ArrayList<String>();
 			while (go) {
-
-				List<String> del = new ArrayList<String>();
-				int i = 0;
 				while (it.hasNext()) {
 					del.add(it.next());
-					if (i > 100) {
+					if (del.size() > 100) {
 						jed.del(del.toArray(new String[del.size()]));
-						i = 0;
+						del = new ArrayList<String>();
 						break;
 					}
-					i++;
 				}
-
+				jed.del(del.toArray(new String[del.size()]));
+				break;
 			}
-			writePool.returnResource(jed);
+
+
 
 		} catch (Exception e) {
 			slowLogger(e, false);
+		}
+		finally{
+			if(jed!=null){
+				writePool.returnResource(jed);
+			}
 		}
 
 	}
