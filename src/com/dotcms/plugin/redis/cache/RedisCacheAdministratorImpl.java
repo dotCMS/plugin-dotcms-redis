@@ -83,7 +83,7 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 		int minIdle = Config.getIntProperty("redis.pool.min.idle", 5);
 		boolean testReturn = Config.getBooleanProperty("redis.pool.test.on.return", false);
 		boolean blockExhausted = Config.getBooleanProperty("redis.pool.block.when.exhausted", false);
-		
+		String redisPass = Config.getStringProperty("redis.password", null);
 
 
 						
@@ -96,8 +96,10 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 		
 		
 		
-		
-		writePool = new JedisPool(conf, writeHost, writePort, timeout);
+
+		writePool = (redisPass==null)  
+			? new JedisPool(conf, writeHost, writePort, timeout)
+			: new JedisPool(conf, writeHost, writePort, timeout, redisPass);
 
 		String readHost = Config.getStringProperty("redis.server.read.address",
 				Config.getStringProperty("redis.server.address", Protocol.DEFAULT_HOST));
@@ -106,8 +108,9 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 		if (readHost.equals(writeHost) && readPort == writePort) {
 			readPool = writePool;
 		} else {
-			readPool = new JedisPool(conf, readHost, readPort, timeout);
-
+			readPool = (redisPass==null)  
+				? new JedisPool(conf, readHost, readPort, timeout)
+				: new JedisPool(conf, readHost, readPort, timeout, redisPass);
 		}
 
 
