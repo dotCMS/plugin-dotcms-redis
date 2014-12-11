@@ -24,7 +24,6 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 
 import com.dotcms.repackage.com.google.common.cache.Cache;
-import com.dotcms.repackage.org.apache.commons.collections.map.LRUMap;
 import com.dotmarketing.business.DotCacheAdministrator;
 import com.dotmarketing.business.DotCacheException;
 import com.dotmarketing.business.DotGuavaCacheAdministratorImpl;
@@ -40,8 +39,8 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 
 	long lastError = 0;
 
-	static private JedisPool readPool;
-	static private JedisPool writePool;
+	 JedisPool readPool;
+	 JedisPool writePool;
 
 	final char delimit = ';';
 
@@ -83,7 +82,7 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 		int minIdle = Config.getIntProperty("redis.pool.min.idle", 5);
 		boolean testReturn = Config.getBooleanProperty("redis.pool.test.on.return", false);
 		boolean blockExhausted = Config.getBooleanProperty("redis.pool.block.when.exhausted", false);
-		String redisPass = Config.getStringProperty("redis.password", null);
+		String redisPass = Config.getStringProperty("redis.password");
 
 
 						
@@ -97,9 +96,9 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 		
 		
 
-		writePool = (redisPass==null)  
-			? new JedisPool(conf, writeHost, writePort, timeout)
-			: new JedisPool(conf, writeHost, writePort, timeout, redisPass);
+		writePool = UtilMethods.isSet(redisPass)
+			? new JedisPool(conf, writeHost, writePort, timeout, redisPass)
+			: new JedisPool(conf, writeHost, writePort, timeout);
 
 		String readHost = Config.getStringProperty("redis.server.read.address",
 				Config.getStringProperty("redis.server.address", Protocol.DEFAULT_HOST));
@@ -108,9 +107,28 @@ public class RedisCacheAdministratorImpl extends DotGuavaCacheAdministratorImpl 
 		if (readHost.equals(writeHost) && readPort == writePort) {
 			readPool = writePool;
 		} else {
-			readPool = (redisPass==null)  
-				? new JedisPool(conf, readHost, readPort, timeout)
-				: new JedisPool(conf, readHost, readPort, timeout, redisPass);
+			readPool = UtilMethods.isSet(redisPass)
+				? new JedisPool(conf, readHost, readPort, timeout,redisPass)
+				: new JedisPool(conf, readHost, readPort, timeout);
+		}
+
+		// Test pool - will throw an error
+		Jedis jedWrite = null;
+		Jedis jedRead = null;
+		try{
+			jedWrite = writePool.getResource();
+			jedRead = readPool.getResource();
+		}
+		catch(Exception e){
+			Logger.error(this.getClass(),e.getMessage(), e);
+		}
+		finally{
+			if(jedWrite!=null){
+				writePool.returnResource(jedWrite);
+			}
+			if(jedRead!=null){
+				readPool.returnResource(jedRead);
+			}
 		}
 
 
